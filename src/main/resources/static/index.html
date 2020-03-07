@@ -1,0 +1,37 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>基于AutoEncoder的漫画风格迁移</title>
+    <link rel="stylesheet" href="plugin/layui/css/layui.css" media="all"/>
+</head>
+<body>
+<div style="margin-left: 20%;text-align: center;width: 30%">
+    <button type="button" class="layui-btn" id="content"  >
+        <i class="layui-icon">&#xe67c;</i>内容图片
+    </button>
+    <br/>
+    <img id="con"/>
+</div>
+<script src="plugin/layui/layui.js"></script>
+<script src="js/jquery-3.4.1.min.js"></script>
+<script>
+    layui.use('upload', function () {
+        var upload = layui.upload;
+
+        //执行实例
+        var uploadInst = upload.render({
+            elem: '#content' //绑定元素
+            , url: '/upload?type=content' //上传接口
+            , done: function (res) {
+                console.log(res);
+                $("#con").attr('src',res.data.src);
+                //上传完毕回调
+            }
+            , error: function () {
+                //请求异常回调
+            }
+        });
+    });
+</script>
+</body>
+</html>
