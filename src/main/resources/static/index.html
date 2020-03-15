@@ -3,28 +3,91 @@
     <meta charset="UTF-8">
     <title>基于AutoEncoder的漫画风格迁移</title>
     <link rel="stylesheet" href="plugin/layui/css/layui.css" media="all"/>
+    <style>
+        .old-img {
+            position: absolute;
+            left: 0;
+            top: 0;
+            user-select: none;
+
+        }
+
+        img {
+            user-select: none;
+        }
+
+        .new-img {
+            position: absolute;
+            left: 0;
+            top: 0;
+            user-select: none;
+            overflow: hidden;
+        }
+
+        .parent {
+            position: relative;
+            width: 224px;
+            height: 224px;
+            background: #343434;
+            left: 0;
+            right: 0;
+        }
+    </style>
 </head>
-<body>
-<div style="margin-left: 20%;text-align: center;width: 30%">
-    <button type="button" class="layui-btn" id="content"  >
+<body style="background: url(background.jpg) no-repeat center 0px;background-size: 100% 100%">
+<div style="margin-left: 20%;text-align: center;width: 20%;display: inline-block">
+    <button type="button" class="layui-btn" id="content">
         <i class="layui-icon">&#xe67c;</i>内容图片
     </button>
     <br/>
-    <img id="con"/>
+    <img id="con" style="width: 200px;height:200px;"/>
 </div>
+<div style="text-align: center;width: 30%;float: right;margin-right: 20%">
+    <button type="button" class="layui-btn" id="style">
+        <i class="layui-icon">&#xe67c;</i>风格图片
+    </button>
+    <br/>
+    <img id="sty" style="width: 200px;height:200px;"/>
+</div>
+<div style="text-align: center;width: 30%; margin-left: 35%">
+    <button type="button" class="layui-btn layui-btn-danger" id="transfer">
+        风格迁移
+    </button>
+</div>
+<br/>
+<div class="parent" style="margin-left: 43%;">
+    <div class="old-img">
+        <img src="img/im6.jpg" style="width: 224px;height: 224px">
+    </div>
+    <div class="new-img" style="width: 100px">
+        <img src="img/im6-s6.jpg" style="width: 224px;height: 224px">
+    </div>
+</div>
+<script src="js/jquery-3.4.1.min.js"></script>
+<script>
+    $(function () {
+        var _move = false;//移动标记
+        var _x, _y;//鼠标离控件左上角的相对位置
+        $(document).mousemove(function (e) {
+            var x = e.pageX - $(".parent").offset().left;
+            var y = e.pageY - $(".parent").offset().top;
+            $(".new-img").css({'width': x});
+        });
+
+    })
+</script>
 <script src="plugin/layui/layui.js"></script>
 <script src="js/jquery-3.4.1.min.js"></script>
 <script>
     layui.use('upload', function () {
         var upload = layui.upload;
-
         //执行实例
         var uploadInst = upload.render({
             elem: '#content' //绑定元素
             , url: '/upload?type=content' //上传接口
             , done: function (res) {
                 console.log(res);
-                $("#con").attr('src',res.data.src);
+                $("#con").attr('src', res.data.src);
                 //上传完毕回调
             }
             , error: function () {
@@ -32,6 +95,42 @@
             }
         });
     });
+    layui.use('upload', function () {
+        var upload = layui.upload;
+
+        //执行实例
+        var uploadInst = upload.render({
+            elem: '#style' //绑定元素
+            , url: '/upload?type=style' //上传接口
+            , done: function (res) {
+                console.log(res);
+                $("#sty").attr('src', res.data.src);
+                //上传完毕回调
+            }
+            , error: function () {
+                //请求异常回调
+            }
+        });
+    });
+    $("#transfer").on('click', function () {
+        var contentPath = $("#con").attr('src');
+        var stylePath = $("#sty").attr('src');
+        var dto = {
+            contentPath: contentPath,
+            stylePath: stylePath
+        };
+        $.ajax({
+            url: '/transfer',
+            method: 'POST',
+            data: dto,
+            success: function (data) {
+                var oldSrc=$("#con").attr('src');
+                alert(data);
+                $(".new-img img").attr('src', data);
+                $(".old-img img").attr('src',oldSrc);
+            }
+        });
+    })
 </script>
 </body>
 </html>

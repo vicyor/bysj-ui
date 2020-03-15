@@ -17,5 +17,7 @@ public class SpringMvcResourceConfig extends WebMvcConfigurerAdapter {
                 .addResourceLocations("file:///D:/bysj-ui/content/");
         registry.addResourceHandler("/style/**")
                 .addResourceLocations("file:///D:/bysj-ui/style/");
+        registry.addResourceHandler("/result/**")
+                .addResourceLocations("file:///D:/bysj-ui/result/");
     }
 }
